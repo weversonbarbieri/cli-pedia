@@ -3,3 +3,4 @@ jupyter
 notebook
 ipykernel
 supabase
+st-supabase-connection==2.1.1
