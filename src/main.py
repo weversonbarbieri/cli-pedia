@@ -1,12 +1,20 @@
 import streamlit as st
-from st_supabase_connection import SupabaseConnection
+from supabase import create_client, Client
 
-# Initialize connection.
-conn = st.connection("supabase",type=SupabaseConnection)
+@st.cache_resource
+def init_connection():
+    url = st.secrets["NEXT_PUBLIC_SUPABASE_URL"]
+    key = st.secrets["NEXT_PUBLIC_SUPABASE_ANON_KEY"]
+    return create_client(url, key)
 
-# Perform query.
-rows = conn.query("*", table="mytable", ttl="10m").execute()
+supabase = init_connection()
 
-# Print results.
-for row in rows.data:
-    st.write(f"{row['name']} has a :{row['pet']}:")
+@st.cache_data(ttl=600)
+
+def run_query():
+    return supabase.table("terminal_commands").select("*").execute()
+
+rows = run_query()
+
+for rows in rows.data:
+    st.write(f"{rows}")
